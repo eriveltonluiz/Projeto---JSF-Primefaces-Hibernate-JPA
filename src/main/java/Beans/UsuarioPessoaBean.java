@@ -92,6 +92,7 @@ public class UsuarioPessoaBean {
 
 	public void pesquisaCep(AjaxBehaviorEvent event) {
 		try {
+			
 			URL url = new URL("http://viacep.com.br/ws/" + usuarioPessoa.getCep() + "/json");
 			URLConnection con = url.openConnection();
 			InputStream inputStream = con.getInputStream();
@@ -125,19 +126,25 @@ public class UsuarioPessoaBean {
 		emailUser = daoEmail.atualizar(emailUser);
 		usuarioPessoa.getListEmails().add(emailUser);
 		emailUser = new EmailUser();
+	
+		emailUser.setUsuarioPessoa(usuarioPessoa);
+		daoEmail.atualizar(emailUser);
+		usuarioPessoa.getListEmails().add(emailUser);
+		emailUser = new EmailUser();
 		
 		FacesContext faces = FacesContext.getCurrentInstance();
 		faces.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Resultado: ", "Email cadastrado com sucesso"));
 	}
 	
 	public void removerEmail() throws Exception {
-		FacesContext faces = FacesContext.getCurrentInstance();
-		ExternalContext context = faces.getExternalContext();
-		String codigoemail = context.getRequestParameterMap().get("codigoemail");	
-		EmailUser remover = new EmailUser();
-		remover.setId(Long.parseLong(codigoemail));
-		daoEmail.deletar(remover);
-		usuarioPessoa.getListEmails().remove(remover);
+		FacesContext context = FacesContext.getCurrentInstance();
+		ExternalContext externalContext = context.getExternalContext();
+		String codigoEmail = externalContext.getRequestParameterMap().get("codigoEmail");
+		
+		EmailUser userEmail = new EmailUser();
+		userEmail.setId(Long.parseLong(codigoEmail));
+		daoEmail.deletar(userEmail);
+		usuarioPessoa.getListEmails().remove(userEmail);
 		
 		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Resultado: ", "Email removido com sucesso"));
 	}
